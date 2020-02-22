@@ -2,13 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const headers = require('./cors');
 const multipart = require('./multipartUtils');
+const messages = require('./messageQueue');
 
 // Path for the background image ///////////////////////
 module.exports.backgroundImageFile = path.join('.', 'background.jpg');
 ////////////////////////////////////////////////////////
 
 let messageQueue = null;
-module.exports.initialize = (queue) => {
+const initialize = (queue) => {
   messageQueue = queue;
 };
 
@@ -19,10 +20,15 @@ module.exports.router = (req, res, next = ()=>{}) => {
   switch (req.method) {
     case 'GET':
       //random command
-      var commands = ['up', 'down', 'left', 'right'];
-      var index = Math.floor(Math.random() * commands.length);
+      // var commands = ['up', 'down', 'left', 'right'];
+      // var index = Math.floor(Math.random() * commands.length);
+      initialize(messages.messages);
+      res.end(messages.dequeue(messageQueue));
 
-      res.end(commands[index]);
+      break;
+
+    // case 'POST':
+    //break;
 
     default:
       res.end();

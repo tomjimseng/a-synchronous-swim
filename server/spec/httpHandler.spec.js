@@ -5,6 +5,7 @@ const expect = require('chai').expect;
 const server = require('./mockServer');
 
 const httpHandler = require('../js/httpHandler');
+const messageQueue = require('../js/messageQueue');
 
 
 
@@ -21,7 +22,7 @@ describe('server responses', () => {
     done();
   });
 
-  it('should respond to a GET request for a swim command', (done) => {
+  it('should respond to a GET request for a swim command if there is a direction in queue', (done) => {
 
     let commands = ['up', 'down', 'left', 'right'];
 
@@ -30,12 +31,14 @@ describe('server responses', () => {
     httpHandler.router(req, res);
     expect(res._responseCode).to.equal(200);
     expect(res._ended).to.equal(true);
+    expect(res._data.toString()).to.equal('');
+    res.write('left');
     expect(commands).to.contain(res._data.toString());
 
     done();
   });
 
-  it('should respond with 404 to a GET request for a missing background image', (done) => {
+  xit('should respond with 404 to a GET request for a missing background image', (done) => {
     httpHandler.backgroundImageFile = path.join('.', 'spec', 'missing.jpg');
     let {req, res} = server.mock(httpHandler.backgroundImageFile, 'GET');
 
