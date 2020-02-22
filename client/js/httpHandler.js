@@ -29,6 +29,7 @@
 
   const ajaxFileUpload = (file) => {
     var formData = new FormData();
+    debugger;
     formData.append('file', file);
     $.ajax({
       type: 'POST',
