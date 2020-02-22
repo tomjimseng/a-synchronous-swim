@@ -13,7 +13,7 @@ const initialize = (queue) => {
   messageQueue = queue;
 };
 
-module.exports.router = (req, res, next = ()=>{}) => {
+module.exports.router = (req, res, next = () => { }) => {
   console.log('Serving request type ' + req.method + ' for url ' + req.url);
 
 
@@ -51,14 +51,24 @@ module.exports.router = (req, res, next = ()=>{}) => {
 
     case 'POST':
       if (req.url === '/background.jpg') {
-        res.writeHead(201, headers);
-        res.end();
-        next();
-      }
+        var fileData = Buffer.alloc(0);
 
-    default:
-      res.writeHead(200, headers);
-      res.end();
+        req.on('data', (chunk) => {
+          fileData = Buffer.concat([fileData, chunk]);
+        });
+
+        req.on('end', () => {
+          fs.writeFile(module.exports.backgroundImageFile, fileData, (err) => {
+            if (err) {
+              res.writeHead(404, headers);
+            } else {
+              res.writeHead(201, headers);
+            }
+            res.end();
+            next();
+          })
+        })
+      }
   }
 
   next(); // invoke next() at the end of a request to help with testing!
