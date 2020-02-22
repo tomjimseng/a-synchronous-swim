@@ -26,6 +26,8 @@ module.exports.router = (req, res, next = ()=>{}) => {
           initialize(messages.messages);
           res.writeHead(200, headers);
           res.end(messages.dequeue(messageQueue));
+          next();
+
           break;
 
         case '/background.jpg':
@@ -33,29 +35,26 @@ module.exports.router = (req, res, next = ()=>{}) => {
 
             if (err) {
               res.writeHead(404, headers);
-              res.end();
-
             } else {
               res.writeHead(200, headers);
-              res.end();
-
+              res.write(data, 'binary');
             }
-          });
-          break;
 
-        default:
-          res.writeHead(404, headers);
+            res.end();
+            next();
+          });
+
+          break;
       }
 
       break;
 
-    // case 'POST':
-    //   fs.writeFile(req.url, req.fileData, (err) => {
-    //     if (err) throw err;
-    //   }, res.writeHead(201, headers));
-
-    //   res.end();
-    //   break;
+    case 'POST':
+      if (req.url === '/background.jpg') {
+        res.writeHead(201, headers);
+        res.end();
+        next();
+      }
 
     default:
       res.writeHead(200, headers);
